@@ -33,8 +33,10 @@ def perform_timeslice(images):
    # compute the width of a vertical slice
    slice_width = width // number_images
    
-   for image_index in range(number_images-1):
-      columns = slice(slice_width*image_index, slice_width*(image_index+1))
+   for image_index in range(number_images):
+      start = slice_width*image_index
+      end = slice_width*(image_index+1) if image_index < number_images-1 else width
+      columns = slice(start, end)
       result[:, columns, :] = images[image_index][:, columns]
    return result
 
