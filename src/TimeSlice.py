@@ -3,6 +3,7 @@
 
 import glob
 import imageio
+import numpy as np
 
 # read command line options
 # TODO
@@ -13,6 +14,7 @@ def load_image_files(directory, extension):
    files = sorted(glob.glob(directory + '/*' + extension))
    if len(files) == 0:
       raise Exception("Error: no image could be found.")
+   
    # load the images as RGB matrices
    return [imageio.imread(file) for file in files]
 
@@ -24,13 +26,20 @@ def check_image_dimensions(images):
 
 # perform chosen timeslice with given options
 def perform_timeslice(images):
+   number_images = len(images)
    (height, width) = images[0].shape[0:2]
-   # TODO
-   return images[0]
+   result = np.zeros(shape=(height, width, 3), dtype='uint8')
+   
+   # compute the width of a vertical slice
+   slice_width = width // number_images
+   for image_index in range(number_images):
+      columns = slice(slice_width*image_index, slice_width*(image_index+1))
+      result[:, columns, :] = images[image_index][:, columns]
+   return result
 
 # save result
 def save_result(result_image, result_file_name):
-   imageio.imwrite(result_file_name, result_image[:, :, 0])
+   imageio.imsave(result_file_name, result_image)
    print("The timeslice was saved in the file %s." % result_file_name)
 
 # main function
